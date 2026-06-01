@@ -3,15 +3,27 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { getSettings } from '@/config'
 
 export default function Navbar() {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [announcements, setAnnouncements] = useState<string[]>([
+    'FREE DELIVERY ISLANDWIDE',
+    'CASH ON DELIVERY AVAILABLE',
+    'NEW ARRIVALS EVERY WEEK'
+  ])
 
   // Add scroll listener for elegant sticky style transitions
   useEffect(() => {
+    getSettings().then(s => {
+      if (s.store_announcement) {
+        setAnnouncements(s.store_announcement.split('|').map(str => str.trim()));
+      }
+    });
+
     const handleScroll = () => {
       if (window.scrollY > 50) {
         setScrolled(true)
@@ -56,18 +68,29 @@ export default function Navbar() {
         }}>
           {/* Centered Info items */}
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-              FREE DELIVERY ISLANDWIDE
-            </span>
-            <span style={{ borderLeft: '1px solid #ead3e9', paddingLeft: '20px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="10" x2="12" y2="10"></line><line x1="8" y1="14" x2="16" y2="14"></line></svg>
-              CASH ON DELIVERY AVAILABLE
-            </span>
-            <span style={{ borderLeft: '1px solid #ead3e9', paddingLeft: '20px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              NEW ARRIVALS EVERY WEEK
-            </span>
+            {announcements.map((ann, index) => (
+              <span 
+                key={index} 
+                style={{ 
+                  borderLeft: index > 0 ? '1px solid #ead3e9' : 'none', 
+                  paddingLeft: index > 0 ? '20px' : '0', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '5px' 
+                }}
+              >
+                {index === 0 && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                )}
+                {index === 1 && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="12" y1="10" x2="12" y2="10"></line><line x1="8" y1="14" x2="16" y2="14"></line></svg>
+                )}
+                {index === 2 && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                )}
+                {ann}
+              </span>
+            ))}
           </div>
 
           {/* Right: Social icons (absolute position on desktop) */}

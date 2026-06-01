@@ -1,61 +1,64 @@
 
 'use client'
 
-import { useState } from 'react'
-
-const initialProducts = [
-  {
-    id: 1,
-    name: 'Lavender Dream Floral Dress',
-    price: 'Rs. 8,900',
-    rawPrice: 8900,
-    image: '/images/categories/dresses.png',
-    badge: 'BEST SELLER',
-    desc: 'Flowing, premium silk chiffon dress designed for absolute elegance.'
-  },
-  {
-    id: 2,
-    name: 'Pastel Violet Silk Blouse',
-    price: 'Rs. 6,500',
-    rawPrice: 6500,
-    image: '/images/categories/tops.png',
-    badge: 'NEW ARRIVAL',
-    desc: 'Breathable boutique silk with tailored cuffs and dynamic neckline.'
-  },
-  {
-    id: 3,
-    name: 'High-Waist Tailored Trousers',
-    price: 'Rs. 7,800',
-    rawPrice: 7800,
-    image: '/images/categories/bottoms.png',
-    badge: 'TRENDING',
-    desc: 'Modern sophisticated straight-cut pants, ideal for upscale settings.'
-  },
-  {
-    id: 4,
-    name: 'Classic Lavender Blazer',
-    price: 'Rs. 12,500',
-    rawPrice: 12500,
-    image: '/images/categories/outerwear.png',
-    badge: 'HOT ITEM',
-    desc: 'Premium structured linen blazer that complements any chic ensemble.'
-  }
-]
+import { useState, useEffect } from 'react'
+import { API_BASE_URL, getSettings, Product } from '@/config'
 
 export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
+  const [loading, setLoading] = useState(true)
+
   // Store selected sizes for each product (keyed by product ID)
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({
-    1: 'M',
-    2: 'M',
-    3: 'M',
-    4: 'M'
-  })
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodRes, settings] = await Promise.all([
+          fetch(`${API_BASE_URL}/products?featured=true`),
+          getSettings()
+        ]);
+        
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          setProducts(data);
+          
+          // Prepopulate sizes
+          const sizes: Record<number, string> = {};
+          data.forEach((p: Product) => {
+            sizes[p.id] = 'M';
+          });
+          setSelectedSizes(sizes);
+        }
+        
+        setWhatsappNum(settings.whatsapp_number);
+      } catch (err) {
+        console.error('Failed to load featured products', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [])
 
   const handleSizeSelect = (productId: number, size: string) => {
     setSelectedSizes(prev => ({
       ...prev,
       [productId]: size
     }))
+  }
+
+  if (loading) {
+    return (
+      <section className="section" style={{ backgroundColor: '#faf6f9', padding: '120px 0', textAlign: 'center' }}>
+        <p style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-serif)', fontSize: '20px' }}>Loading masterpieces...</p>
+      </section>
+    )
+  }
+
+  if (products.length === 0) {
+    return null;
   }
 
   return (
@@ -89,9 +92,9 @@ export default function FeaturedProducts() {
 
         {/* Product Grid */}
         <div className="product-grid featured-grid">
-          {initialProducts.map((p) => {
+          {products.map((p) => {
             const currentSize = selectedSizes[p.id] || 'M'
-            const whatsappUrl = `https://wa.me/94771234567?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
+            const whatsappUrl = `https://wa.me/${whatsappNum}?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
 
             return (
               <div key={p.id} className="card product-card" style={{
@@ -113,20 +116,22 @@ export default function FeaturedProducts() {
                   </a>
 
                   {/* Elegant floating badge */}
-                  <span style={{
-                    position: 'absolute',
-                    top: '20px',
-                    left: '20px',
-                    backgroundColor: 'var(--color-primary)',
-                    color: '#ffffff',
-                    fontSize: '10px',
-                    fontWeight: '700',
-                    letterSpacing: '1.2px',
-                    padding: '6px 14px',
-                    borderRadius: '50px',
-                    boxShadow: '0 4px 10px rgba(112, 15, 92, 0.15)',
-                    zIndex: 5
-                  }}>{p.badge}</span>
+                  {p.badge && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '20px',
+                      left: '20px',
+                      backgroundColor: 'var(--color-primary)',
+                      color: '#ffffff',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      letterSpacing: '1.2px',
+                      padding: '6px 14px',
+                      borderRadius: '50px',
+                      boxShadow: '0 4px 10px rgba(112, 15, 92, 0.15)',
+                      zIndex: 5
+                    }}>{p.badge}</span>
+                  )}
                 </div>
 
                 {/* Product Content Details */}
@@ -236,3 +241,4 @@ export default function FeaturedProducts() {
     </section>
   )
 }
+

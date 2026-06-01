@@ -1,11 +1,20 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { API_BASE_URL } from '@/config'
 
-const galleryItems = [
+interface GalleryItem {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  aspect: string;
+}
+
+const initialGalleryItems: GalleryItem[] = [
   {
     id: 1,
     title: 'Lavender Archway Shoot',
@@ -52,6 +61,26 @@ const galleryItems = [
 
 export default function Page() {
   const [activeImage, setActiveImage] = useState<string | null>(null)
+  const [items, setItems] = useState<GalleryItem[]>(initialGalleryItems)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchGallery() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/gallery`);
+        if (!res.ok) throw new Error('Failed to fetch gallery');
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setItems(data);
+        }
+      } catch (err) {
+        console.warn('Backend lookbook API unreachable, falling back to local campaigns.', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchGallery();
+  }, [])
 
   return (
     <main>
@@ -98,7 +127,7 @@ export default function Page() {
         <div className="container">
           
           <div className="product-grid lookbook-grid">
-            {galleryItems.map((item) => (
+            {items.map((item) => (
               <div 
                 key={item.id}
                 onClick={() => setActiveImage(item.image)}

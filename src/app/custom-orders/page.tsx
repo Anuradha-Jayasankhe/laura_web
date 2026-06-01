@@ -1,9 +1,10 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { API_BASE_URL, getSettings } from '@/config'
 
 const bespokeSteps = [
   {
@@ -30,6 +31,7 @@ const bespokeSteps = [
 
 export default function Page() {
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -42,6 +44,10 @@ export default function Page() {
     notes: ''
   })
 
+  useEffect(() => {
+    getSettings().then(s => setWhatsappNum(s.whatsapp_number));
+  }, [])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -50,16 +56,36 @@ export default function Page() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (formData.name && formData.phone) {
-      setFormSubmitted(true)
+      try {
+        const payload = {
+          ...formData,
+          bust: formData.bust ? Number(formData.bust) : null,
+          waist: formData.waist ? Number(formData.waist) : null,
+          hips: formData.hips ? Number(formData.hips) : null,
+          height: formData.height ? Number(formData.height) : null
+        };
+        
+        await fetch(`${API_BASE_URL}/custom-orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        setFormSubmitted(true)
+      } catch (err) {
+        console.error('Failed to log custom order', err);
+        // Fallback to true so order workflow still proceeds via WhatsApp even if server fails
+        setFormSubmitted(true)
+      }
     }
   }
 
   // Pre-formatted WhatsApp link with custom measurements details
   const formattedWhatsappMsg = `Hi Laura Premium! I have submitted a Bespoke Custom Order request:\n\n*Name:* ${formData.name}\n*WhatsApp:* ${formData.phone}\n*Garment Type:* ${formData.garmentType}\n*Fabric Preference:* ${formData.fabric}\n\n*Measurements:*\n- Bust: ${formData.bust || 'N/A'} inches\n- Waist: ${formData.waist || 'N/A'} inches\n- Hips: ${formData.hips || 'N/A'} inches\n- Height: ${formData.height || 'N/A'} inches\n\n*Style Notes:* ${formData.notes || 'None'}`
-  const whatsappUrl = `https://wa.me/94771234567?text=${encodeURIComponent(formattedWhatsappMsg)}`
+  const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent(formattedWhatsappMsg)}`
 
   return (
     <main>

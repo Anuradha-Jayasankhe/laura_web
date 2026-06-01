@@ -1,98 +1,56 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-
-const productsData = [
-  {
-    id: 1,
-    name: 'Lavender Dream Floral Dress',
-    category: 'DRESSES',
-    price: 'Rs. 8,900',
-    rawPrice: 8900,
-    image: '/images/categories/dresses.png',
-    badge: 'BEST SELLER',
-    desc: 'Flowing, premium silk chiffon dress designed for absolute elegance.'
-  },
-  {
-    id: 2,
-    name: 'Pastel Violet Silk Blouse',
-    category: 'TOPS',
-    price: 'Rs. 6,500',
-    rawPrice: 6500,
-    image: '/images/categories/tops.png',
-    badge: 'NEW ARRIVAL',
-    desc: 'Breathable boutique silk with tailored cuffs and dynamic neckline.'
-  },
-  {
-    id: 3,
-    name: 'High-Waist Tailored Trousers',
-    category: 'BOTTOMS',
-    price: 'Rs. 7,800',
-    rawPrice: 7800,
-    image: '/images/categories/bottoms.png',
-    badge: 'TRENDING',
-    desc: 'Modern sophisticated straight-cut pants, ideal for upscale settings.'
-  },
-  {
-    id: 4,
-    name: 'Classic Lavender Blazer',
-    category: 'OUTERWEAR',
-    price: 'Rs. 12,500',
-    rawPrice: 12500,
-    image: '/images/categories/outerwear.png',
-    badge: 'HOT ITEM',
-    desc: 'Premium structured linen blazer that complements any chic ensemble.'
-  },
-  {
-    id: 5,
-    name: 'Lavender Garden Sundress',
-    category: 'DRESSES',
-    price: 'Rs. 9,200',
-    rawPrice: 9200,
-    image: '/images/categories/dresses.png',
-    badge: 'NEW',
-    desc: 'Bespoke high-end floral print dress, hand-tailored for warm boutique comfort.'
-  },
-  {
-    id: 6,
-    name: 'Amethyst Silk Wrap Top',
-    category: 'TOPS',
-    price: 'Rs. 5,900',
-    rawPrice: 5900,
-    image: '/images/categories/tops.png',
-    badge: 'TRENDING',
-    desc: 'Sleek premium wrap top featuring dynamic flared sleeves and tie details.'
-  },
-  {
-    id: 7,
-    name: 'Chic Orchid Linen Shorts',
-    category: 'BOTTOMS',
-    price: 'Rs. 4,800',
-    rawPrice: 4800,
-    image: '/images/categories/bottoms.png',
-    badge: 'NEW',
-    desc: 'Lightweight high-rise tailored linen shorts, ideal for casual e-commerce looks.'
-  },
-  {
-    id: 8,
-    name: 'Elegant Lavender Leather Tote',
-    category: 'ACCESSORIES',
-    price: 'Rs. 14,500',
-    rawPrice: 14500,
-    image: '/images/categories/accessories.png',
-    badge: 'LUXURY',
-    desc: 'Genuine handcrafted leather tote bag with sleek gold-plated hardware.'
-  }
-]
+import { API_BASE_URL, getSettings, Product, Category } from '@/config'
 
 export default function Page() {
+  const [products, setProducts] = useState<Product[]>([])
   const [activeCategory, setActiveCategory] = useState('ALL')
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({
-    1: 'M', 2: 'M', 3: 'M', 4: 'M', 5: 'M', 6: 'M', 7: 'M', 8: 'M'
-  })
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
+  const [loading, setLoading] = useState(true)
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({})
+  const [filterTabs, setFilterTabs] = useState<string[]>(['ALL'])
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodRes, settings, catRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/products`),
+          getSettings(),
+          fetch(`${API_BASE_URL}/categories`)
+        ]);
+        
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          setProducts(data);
+          
+          const sizes: Record<number, string> = {};
+          data.forEach((p: Product) => {
+            sizes[p.id] = 'M';
+          });
+          setSelectedSizes(sizes);
+        }
+
+        if (catRes.ok) {
+          const categories: Category[] = await catRes.json();
+          setFilterTabs(['ALL', ...categories.map(c => c.code)]);
+        } else {
+          setFilterTabs(['ALL', 'DRESSES', 'TOPS', 'BOTTOMS', 'OUTERWEAR', 'ACCESSORIES']);
+        }
+        
+        setWhatsappNum(settings.whatsapp_number);
+      } catch (err) {
+        console.error('Failed to load collections data', err);
+        setFilterTabs(['ALL', 'DRESSES', 'TOPS', 'BOTTOMS', 'OUTERWEAR', 'ACCESSORIES']);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [])
 
   const handleSizeSelect = (productId: number, size: string) => {
     setSelectedSizes(prev => ({
@@ -103,10 +61,9 @@ export default function Page() {
 
   // Filter products based on active category
   const filteredProducts = activeCategory === 'ALL'
-    ? productsData
-    : productsData.filter(p => p.category === activeCategory)
+    ? products
+    : products.filter(p => p.category === activeCategory)
 
-  const filterTabs = ['ALL', 'DRESSES', 'TOPS', 'BOTTOMS', 'OUTERWEAR', 'ACCESSORIES']
 
   return (
     <main>
@@ -187,7 +144,7 @@ export default function Page() {
           <div className="product-grid">
             {filteredProducts.map((p) => {
               const currentSize = selectedSizes[p.id] || 'M'
-              const whatsappUrl = `https://wa.me/94771234567?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
+              const whatsappUrl = `https://wa.me/${whatsappNum}?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
 
               return (
                 <div key={p.id} className="card product-card" style={{
@@ -209,19 +166,21 @@ export default function Page() {
                       }} className="product-card-img" />
                     </a>
 
-                    <span style={{
-                      position: 'absolute',
-                      top: '20px',
-                      left: '20px',
-                      backgroundColor: 'var(--color-primary)',
-                      color: '#ffffff',
-                      fontSize: '10px',
-                      fontWeight: '700',
-                      letterSpacing: '1.2px',
-                      padding: '6px 14px',
-                      borderRadius: '50px',
-                      zIndex: 5
-                    }}>{p.badge}</span>
+                    {p.badge && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '20px',
+                        left: '20px',
+                        backgroundColor: 'var(--color-primary)',
+                        color: '#ffffff',
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        letterSpacing: '1.2px',
+                        padding: '6px 14px',
+                        borderRadius: '50px',
+                        zIndex: 5
+                      }}>{p.badge}</span>
+                    )}
                   </div>
 
                   {/* Product Info */}

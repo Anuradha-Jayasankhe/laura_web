@@ -1,49 +1,49 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-
-const newArrivalsData = [
-  {
-    id: 1,
-    name: 'Lavender Dream Floral Dress',
-    price: 'Rs. 8,900',
-    image: '/images/categories/dresses.png',
-    badge: 'NEW',
-    desc: 'Flowing, premium silk chiffon dress designed for absolute elegance.'
-  },
-  {
-    id: 2,
-    name: 'Pastel Violet Silk Blouse',
-    price: 'Rs. 6,500',
-    image: '/images/categories/tops.png',
-    badge: 'NEW',
-    desc: 'Breathable boutique silk with tailored cuffs and dynamic neckline.'
-  },
-  {
-    id: 5,
-    name: 'Lavender Garden Sundress',
-    price: 'Rs. 9,200',
-    image: '/images/categories/dresses.png',
-    badge: 'NEW',
-    desc: 'Bespoke high-end floral print dress, hand-tailored for warm boutique comfort.'
-  },
-  {
-    id: 6,
-    name: 'Amethyst Silk Wrap Top',
-    price: 'Rs. 5,900',
-    image: '/images/categories/tops.png',
-    badge: 'NEW',
-    desc: 'Sleek premium wrap top featuring dynamic flared sleeves and tie details.'
-  }
-]
+import { API_BASE_URL, getSettings, Product } from '@/config'
 
 export default function Page() {
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({
-    1: 'M', 2: 'M', 5: 'M', 6: 'M'
-  })
+  const [products, setProducts] = useState<Product[]>([])
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
+  const [loading, setLoading] = useState(true)
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodRes, settings] = await Promise.all([
+          fetch(`${API_BASE_URL}/products`),
+          getSettings()
+        ]);
+        
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          // Filter products with "NEW" or "NEW ARRIVAL" badges to populate new arrivals
+          const newItems = data.filter((p: Product) => 
+            p.badge && (p.badge.toUpperCase().includes('NEW') || p.badge.toUpperCase().includes('HOT'))
+          );
+          setProducts(newItems.length > 0 ? newItems : data.slice(0, 4)); // fallback to first 4 if none
+          
+          const sizes: Record<number, string> = {};
+          data.forEach((p: Product) => {
+            sizes[p.id] = 'M';
+          });
+          setSelectedSizes(sizes);
+        }
+        
+        setWhatsappNum(settings.whatsapp_number);
+      } catch (err) {
+        console.error('Failed to load new arrivals', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [])
 
   const handleSizeSelect = (productId: number, size: string) => {
     setSelectedSizes(prev => ({
@@ -51,6 +51,7 @@ export default function Page() {
       [productId]: size
     }))
   }
+
 
   return (
     <main>
@@ -97,9 +98,9 @@ export default function Page() {
         <div className="container">
           
           <div className="product-grid">
-            {newArrivalsData.map((p) => {
+            {products.map((p) => {
               const currentSize = selectedSizes[p.id] || 'M'
-              const whatsappUrl = `https://wa.me/94771234567?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20New%20Arrival%3A%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
+              const whatsappUrl = `https://wa.me/${whatsappNum}?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20New%20Arrival%3A%20*${encodeURIComponent(p.name)}*%20in%20size%20*${currentSize}*%20for%20*${p.price}*.%20Is%20it%20available%3F`
 
               return (
                 <div key={p.id} className="card product-card" style={{
@@ -121,19 +122,21 @@ export default function Page() {
                       }} className="product-card-img" />
                     </a>
 
-                    <span style={{
-                      position: 'absolute',
-                      top: '20px',
-                      left: '20px',
-                      backgroundColor: 'var(--color-primary)',
-                      color: '#ffffff',
-                      fontSize: '10px',
-                      fontWeight: '700',
-                      letterSpacing: '1.2px',
-                      padding: '6px 14px',
-                      borderRadius: '50px',
-                      zIndex: 5
-                    }}>{p.badge}</span>
+                    {p.badge && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '20px',
+                        left: '20px',
+                        backgroundColor: 'var(--color-primary)',
+                        color: '#ffffff',
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        letterSpacing: '1.2px',
+                        padding: '6px 14px',
+                        borderRadius: '50px',
+                        zIndex: 5
+                      }}>{p.badge}</span>
+                    )}
                   </div>
 
                   {/* Product Info */}

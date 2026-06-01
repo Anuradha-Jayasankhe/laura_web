@@ -1,64 +1,10 @@
 
 'use client'
 
-import { useState, use } from 'react'
+import { useState, useEffect, use } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-
-const productsCatalog = [
-  {
-    id: 1,
-    name: 'Lavender Dream Floral Dress',
-    price: 'Rs. 8,900',
-    rawPrice: 8900,
-    image: '/images/categories/dresses.png',
-    badge: 'BEST SELLER',
-    category: 'DRESSES',
-    desc: 'Indulge in pure feminine grace with our Lavender Dream Floral Dress. Meticulously handcrafted from premium flowing silk chiffon, this masterpiece features delicate floral print details, a graceful wrap silhouette, and comfortable tiered layers that flow beautifully with every step.',
-    details: 'Made from 100% pure silk chiffon. Features an invisible back zipper, soft inner viscose lining, and elegant flared cuffs. Hand-tailored for a premium fit.',
-    care: 'Dry clean only. Iron inside out on low heat. Do not bleach. Keep away from sharp jewelry.',
-    shipping: 'Delivery within 2-3 business days islandwide. Cash on delivery available. Standard shipping is Rs. 350.'
-  },
-  {
-    id: 2,
-    name: 'Pastel Violet Silk Blouse',
-    price: 'Rs. 6,500',
-    rawPrice: 6500,
-    image: '/images/categories/tops.png',
-    badge: 'NEW ARRIVAL',
-    category: 'TOPS',
-    desc: 'Define sophistication with our signature Pastel Violet Silk Blouse. Crafted from ultra-breathable high-grade boutique silk, it boasts uniquely tailored statement cuffs, a versatile collar structure, and a smooth lustrous finish that elevates any evening or professional outfit.',
-    details: 'Crafted from premium boutique Mulberry silk (90%) and elastane (10%) for a comfortable stretch. Hand-tailored statement double-buttons.',
-    care: 'Hand wash cold with mild detergent. Hang dry in shade. Light steam iron. Do not tumble dry.',
-    shipping: 'Delivery within 2-3 business days islandwide. Cash on delivery available. Standard shipping is Rs. 350.'
-  },
-  {
-    id: 3,
-    name: 'High-Waist Tailored Trousers',
-    price: 'Rs. 7,800',
-    rawPrice: 7800,
-    image: '/images/categories/bottoms.png',
-    badge: 'TRENDING',
-    category: 'BOTTOMS',
-    desc: 'Add structure to your daily look with the High-Waist Tailored Trousers. Cut in an elegant straight-leg style with fine front creases, these pants are tailored from high-quality linen blend fabrics, providing both structural perfection and all-day breathable comfort.',
-    details: 'Structured blend of premium organic linen (60%) and soft cotton (40%). Features functional side pockets and clean belt loops.',
-    care: 'Machine wash delicate cold. Lay flat to dry. Hot steam iron recommended. Wash dark colors separately.',
-    shipping: 'Delivery within 2-3 business days islandwide. Cash on delivery available. Standard shipping is Rs. 350.'
-  },
-  {
-    id: 4,
-    name: 'Classic Lavender Blazer',
-    price: 'Rs. 12,500',
-    rawPrice: 12500,
-    image: '/images/categories/outerwear.png',
-    badge: 'HOT ITEM',
-    category: 'OUTERWEAR',
-    desc: 'The absolute pinnacle of luxury outerwear. Our Classic Lavender Blazer features double-breasted buttoning, sharp notch lapels, and a soft matching lining. Expertly structured to create a flattering silhouette while maintaining ultimate boutique comfort.',
-    details: 'Made from 100% high-quality linen. Internal matching polyester satin lining. Dual functional front flap pockets and horn-style buttons.',
-    care: 'Dry clean only. Steam iron only. Hang on wide-shouldered wooden hangers. Store in a breathable garment bag.',
-    shipping: 'Delivery within 2-3 business days islandwide. Cash on delivery available. Standard shipping is Rs. 350.'
-  }
-]
+import { API_BASE_URL, getSettings, Product } from '@/config'
 
 export default function ProductPage({ params }: { params: any }) {
   // Safeguard Next.js 15 Promise params vs Next.js 14 plain objects
@@ -66,13 +12,37 @@ export default function ProductPage({ params }: { params: any }) {
   const idStr = unwrappedParams?.id || '1'
   const productId = parseInt(idStr) || 1
 
-  // Find product by id, default fallback to product id 1 to avoid crashes
-  const product = productsCatalog.find(p => p.id === productId) || productsCatalog[0]
+  const [product, setProduct] = useState<Product | null>(null)
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
+  const [loading, setLoading] = useState(true)
 
   // Stateful interactive configurations
   const [selectedSize, setSelectedSize] = useState('M')
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('description')
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [prodRes, settings] = await Promise.all([
+          fetch(`${API_BASE_URL}/products/${productId}`),
+          getSettings()
+        ]);
+        
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          setProduct(data);
+        }
+        
+        setWhatsappNum(settings.whatsapp_number);
+      } catch (err) {
+        console.error('Failed to load product details', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [productId])
 
   const handleQtyChange = (type: 'inc' | 'dec') => {
     if (type === 'inc') {
@@ -82,9 +52,33 @@ export default function ProductPage({ params }: { params: any }) {
     }
   }
 
+  if (loading) {
+    return (
+      <main>
+        <Navbar />
+        <section className="section" style={{ backgroundColor: '#ffffff', padding: '120px 0', textAlign: 'center' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-serif)', fontSize: '20px' }}>Loading masterpiece details...</p>
+        </section>
+        <Footer />
+      </main>
+    )
+  }
+
+  if (!product) {
+    return (
+      <main>
+        <Navbar />
+        <section className="section" style={{ backgroundColor: '#ffffff', padding: '120px 0', textAlign: 'center' }}>
+          <p style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-serif)', fontSize: '20px' }}>Masterpiece not found.</p>
+        </section>
+        <Footer />
+      </main>
+    )
+  }
+
   // Pre-calculate total price
   const totalPrice = product.rawPrice * quantity
-  const whatsappUrl = `https://wa.me/94771234567?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(product.name)}*%20in%20size%20*${selectedSize}*%20(Quantity%3A%20*${quantity}*).%20Total%20order%20value%3A%20*Rs.%20${totalPrice.toLocaleString()}*.%20Is%20it%20available%3F`
+  const whatsappUrl = `https://wa.me/${whatsappNum}?text=Hi%20Laura%20Premium%21%20I%20would%20like%20to%20order%20the%20*${encodeURIComponent(product.name)}*%20in%20size%20*${selectedSize}*%20(Quantity%3A%20*${quantity}*).%20Total%20order%20value%3A%20*Rs.%20${totalPrice.toLocaleString()}*.%20Is%20it%20available%3F`
 
   return (
     <main>
@@ -128,20 +122,22 @@ export default function ProductPage({ params }: { params: any }) {
               </div>
 
               {/* Floating badges */}
-              <span style={{
-                position: 'absolute',
-                top: '25px',
-                left: '25px',
-                backgroundColor: 'var(--color-primary)',
-                color: '#ffffff',
-                fontSize: '11px',
-                fontWeight: '700',
-                letterSpacing: '1.2px',
-                padding: '6px 16px',
-                borderRadius: '50px',
-                boxShadow: '0 4px 12px rgba(112, 15, 92, 0.15)',
-                zIndex: 5
-              }}>{product.badge}</span>
+              {product.badge && (
+                <span style={{
+                  position: 'absolute',
+                  top: '25px',
+                  left: '25px',
+                  backgroundColor: 'var(--color-primary)',
+                  color: '#ffffff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  letterSpacing: '1.2px',
+                  padding: '6px 16px',
+                  borderRadius: '50px',
+                  boxShadow: '0 4px 12px rgba(112, 15, 92, 0.15)',
+                  zIndex: 5
+                }}>{product.badge}</span>
+              )}
             </div>
 
             {/* Right Column: Interactive Details */}

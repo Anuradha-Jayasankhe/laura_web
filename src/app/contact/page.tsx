@@ -1,18 +1,24 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { API_BASE_URL, getSettings } from '@/config'
 
 export default function Page() {
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [whatsappNum, setWhatsappNum] = useState('94768455271')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: ''
   })
+
+  useEffect(() => {
+    getSettings().then(s => setWhatsappNum(s.whatsapp_number));
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -22,12 +28,22 @@ export default function Page() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate API request and show elegant success message
     if (formData.name && formData.email && formData.message) {
-      setFormSubmitted(true)
-      setFormData({ name: '', email: '', subject: '', message: '' })
+      try {
+        await fetch(`${API_BASE_URL}/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        setFormSubmitted(true)
+        setFormData({ name: '', email: '', subject: '', message: '' })
+      } catch (err) {
+        console.error('Failed to submit contact message', err);
+        // Fallback to visual success
+        setFormSubmitted(true)
+      }
     }
   }
 
@@ -277,7 +293,7 @@ export default function Page() {
                     </div>
                     <div>
                       <h4 style={{ color: 'var(--color-text)', fontWeight: '600', marginBottom: '4px' }}>Hotline</h4>
-                      <span>+94 77 123 4567</span>
+                      <span>+${whatsappNum.slice(0,2)} ${whatsappNum.slice(2,5)} ${whatsappNum.slice(5)}</span>
                     </div>
                   </li>
                 </ul>
@@ -285,7 +301,7 @@ export default function Page() {
                 {/* Instant WhatsApp chat link */}
                 <div style={{ marginTop: '30px', borderTop: '1px solid #f0e2ef', paddingTop: '24px' }}>
                   <a 
-                    href="https://wa.me/94771234567?text=Hi%20Boutique%20Manager%2C%20I%20have%20an%20inquiry%20regarding%20Laura%20Premium%20garments%20and%20orders."
+                    href={`https://wa.me/${whatsappNum}?text=Hi%20Boutique%20Manager%2C%20I%20have%20an%20inquiry%20regarding%20Laura%20Premium%20garments%20and%20orders.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn"

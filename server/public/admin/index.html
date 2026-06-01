@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laura Premium - Boutique Admin Panel</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS not used; Vanilla Custom stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       1. Login Section (Frosted Glass Panel)
+       ========================================== -->
+  <div id="login-container" class="login-wrapper">
+    <div class="glass-card login-card animate-fade-in">
+      <div class="login-logo-header">
+        <span class="logo-flower">🌸</span>
+        <h1 class="serif-title">Laura Premium</h1>
+        <p class="subtitle">Boutique Administration Dashboard</p>
+      </div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label for="admin-password">ADMIN ACCESS PASSWORD</label>
+          <input type="password" id="admin-password" placeholder="••••••••••••••" required>
+          <span class="password-hint">Enter your boutique administration credentials to login</span>
+        </div>
+        
+        <div id="login-error" class="error-msg hide">Incorrect credentials, please try again.</div>
+        
+        <button type="submit" class="btn btn-primary btn-block">
+          SECURE ACCESS LOGIN
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       2. Main Dashboard Suite (Visible on Auth)
+       ========================================== -->
+  <div id="dashboard-container" class="dashboard-wrapper hide">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar glass-sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-logo">🌸</span>
+        <div>
+          <h2>LAURA</h2>
+          <span class="tag">PREMIUM BOUTIQUE</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a href="#" class="menu-item active" data-tab="home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          Dashboard Hub
+        </a>
+        <a href="#" class="menu-item" data-tab="products">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          Manage Catalog
+        </a>
+        <a href="#" class="menu-item" data-tab="orders">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          Bespoke Orders
+          <span id="badge-orders" class="count-badge hide">0</span>
+        </a>
+        <a href="#" class="menu-item" data-tab="messages">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Customer Inbox
+          <span id="badge-messages" class="count-badge hide">0</span>
+        </a>
+        <a href="#" class="menu-item" data-tab="categories">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+          Manage Categories
+        </a>
+        <a href="#" class="menu-item" data-tab="gallery">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          Lookbook Gallery
+        </a>
+        <a href="#" class="menu-item" data-tab="settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.5 1z"></path></svg>
+          Store Settings
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-outline btn-block">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Secure Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      
+      <!-- Top navbar -->
+      <header class="dashboard-header glass-card">
+        <div class="header-search">
+          <h1 id="tab-title">Dashboard Hub</h1>
+        </div>
+        <div class="header-profile">
+          <div class="admin-badge">
+            <span class="status-dot online"></span>
+            <span>Boutique Manager</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           TAB A: HOME / DASHBOARD HUB
+           ========================================== -->
+      <div id="tab-home" class="tab-pane active">
+        
+        <!-- Stats Banner -->
+        <div class="stats-grid">
+          <div class="glass-card stat-box">
+            <div class="stat-icon purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Boutique Catalog</span>
+              <h3 id="stat-products-count" class="stat-value">0</h3>
+              <span class="stat-desc">Active dynamic products</span>
+            </div>
+          </div>
+
+          <div class="glass-card stat-box">
+            <div class="stat-icon orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Bespoke Fitting Orders</span>
+              <h3 id="stat-orders-count" class="stat-value">0</h3>
+              <span class="stat-desc">Custom fitting metrics logged</span>
+            </div>
+          </div>
+
+          <div class="glass-card stat-box">
+            <div class="stat-icon blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Pending Messages</span>
+              <h3 id="stat-messages-count" class="stat-value">0</h3>
+              <span class="stat-desc">Unread website contact tickets</span>
+            </div>
+          </div>
+
+          <div class="glass-card stat-box">
+            <div class="stat-icon green">
+              <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.197 1.451 4.811 1.452 5.513 0 9.997-4.493 10.001-10.01.002-2.673-1.03-5.187-2.91-7.07C16.66 1.642 14.15 1.6 11.999 1.6c-5.517 0-10.002 4.493-10.006 10.011 0 1.696.447 3.354 1.3 4.816L2.3 21.73l5.347-1.402z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Store WhatsApp hotline</span>
+              <h3 id="stat-whatsapp" class="stat-value">076 8455271</h3>
+              <span class="stat-desc">Linked directly to order triggers</span>
+            </div>
+          </div>
+
+          <div class="glass-card stat-box">
+            <div class="stat-icon purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Lookbook Items</span>
+              <h3 id="stat-gallery-count" class="stat-value">0</h3>
+              <span class="stat-desc">Active campaign looks</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Grid showing lists -->
+        <div class="dashboard-details-grid">
+          
+          <!-- Recent custom orders -->
+          <div class="glass-card detail-card">
+            <div class="card-header">
+              <h3 class="serif-title">Recent Custom Fitting Submissions</h3>
+              <button class="btn-text view-all-btn" data-tab="orders">View All</button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Garment</th>
+                      <th>Measurements (Bust/Waist/Hips)</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-orders-list">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent messages -->
+          <div class="glass-card detail-card">
+            <div class="card-header">
+              <h3 class="serif-title">Recent Inquiries Inbox</h3>
+              <button class="btn-text view-all-btn" data-tab="messages">View All</button>
+            </div>
+            <div class="card-body">
+              <div class="inbox-list" id="recent-messages-list">
+                <!-- Loaded dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB B: PRODUCTS MANAGEMENT
+           ========================================== -->
+      <div id="tab-products" class="tab-pane">
+        
+        <div class="tab-actions-header">
+          <div class="filter-controls">
+            <select id="product-category-filter" class="form-input select-pill">
+              <option value="ALL">All Categories</option>
+            </select>
+          </div>
+          
+          <button id="add-product-btn" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            ADD NEW PRODUCT
+          </button>
+        </div>
+
+        <!-- Products table list -->
+        <div class="glass-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Image</th>
+                  <th>ID</th>
+                  <th>Product Details</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Badge Tag</th>
+                  <th>Featured</th>
+                  <th style="width: 150px; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-list">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB C: BESPOKE CUSTOM ORDERS
+           ========================================== -->
+      <div id="tab-orders" class="tab-pane">
+        
+        <div class="glass-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Contact Phone</th>
+                  <th>Garment Type</th>
+                  <th>Fabric</th>
+                  <th>Measurements (Inches)</th>
+                  <th>Status</th>
+                  <th>Date Logged</th>
+                  <th style="width: 250px; text-align: right;">Bespoke Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-list">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB D: CUSTOMER MESSAGES
+           ========================================== -->
+      <div id="tab-messages" class="tab-pane">
+        
+        <div class="inbox-container" id="admin-messages-list">
+          <!-- Loaded dynamically -->
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB F: CATEGORIES MANAGEMENT
+           ========================================== -->
+      <div id="tab-categories" class="tab-pane">
+        
+        <div class="dashboard-details-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+          <!-- Category List Table -->
+          <div class="glass-card detail-card">
+            <div class="card-header">
+              <h3 class="serif-title">Active Boutique Categories</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th>Reference Code</th>
+                    <th style="width: 100px; text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-categories-list">
+                  <!-- Loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Category Creation Card -->
+          <div class="glass-card detail-card">
+            <div class="card-header">
+              <h3 class="serif-title">Add New Category</h3>
+            </div>
+            <form id="category-form">
+              <div class="form-group">
+                <label for="cat-name">CATEGORY NAME *</label>
+                <input type="text" id="cat-name" required placeholder="e.g. Lookbook Shoes">
+              </div>
+              <div class="form-group">
+                <label for="cat-code">REFERENCE CODE *</label>
+                <input type="text" id="cat-code" required placeholder="e.g. ACCESSORIES">
+                <span class="password-hint">Used for system filtering (e.g., ACCESSORIES, DRESSES, TOPS).</span>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">
+                CREATE NEW CATEGORY
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB E: STORE SETTINGS
+           ========================================== -->
+      <div id="tab-settings" class="tab-pane">
+        
+        <div class="glass-card settings-card animate-fade-in" style="max-width: 800px; margin: 0 auto;">
+          <h2 class="serif-title" style="margin-bottom: 24px;">Boutique Global Settings</h2>
+          
+          <form id="settings-form">
+            <div class="form-group">
+              <label for="settings-whatsapp">WHATSAPP ORDER HOTLINE NUMBER *</label>
+              <input type="text" id="settings-whatsapp" required placeholder="94768455271">
+              <span class="password-hint">Enter in international format without + or spaces (e.g. 94768455271 for 076 8455271). This governs all website order links.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="settings-announcement">ANNOUNCEMENT TEXT BANNER</label>
+              <textarea id="settings-announcement" rows="3" required placeholder="FREE DELIVERY ISLANDWIDE | CASH ON DELIVERY | NEW ARRIVALS"></textarea>
+              <span class="password-hint">Sets the glowing top alert message across all website layout layers.</span>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="settings-imgbb-key">IMGBB API KEY *</label>
+                <input type="text" id="settings-imgbb-key" required placeholder="f2ac2dc4433d0a5a6cdb4831b9a0d68c">
+              </div>
+              <div class="form-group">
+                <label for="settings-imgbb-url">IMGBB UPLOAD URL *</label>
+                <input type="text" id="settings-imgbb-url" required placeholder="https://api.imgbb.com/1/upload">
+              </div>
+            </div>
+
+            <div id="settings-success" class="success-banner hide">Settings updated and synchronized successfully!</div>
+            
+            <button type="submit" class="btn btn-primary" style="margin-top: 20px; padding: 14px 40px;">
+              SYNCHRONIZE STORE SETTINGS
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           TAB G: LOOKBOOK GALLERY MANAGEMENT
+           ========================================== -->
+      <div id="tab-gallery" class="tab-pane">
+        
+        <div class="tab-actions-header">
+          <div class="filter-controls">
+            <select id="gallery-category-filter" class="form-input select-pill">
+              <option value="ALL">All Categories</option>
+              <option value="Editorial">Editorial</option>
+              <option value="Collection">Collection</option>
+              <option value="Tailoring">Tailoring</option>
+              <option value="Detail">Detail</option>
+              <option value="Bespoke">Bespoke</option>
+            </select>
+          </div>
+          
+          <button id="add-gallery-item-btn" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            ADD LOOKBOOK ITEM
+          </button>
+        </div>
+
+        <!-- Gallery table list -->
+        <div class="glass-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Image</th>
+                  <th>ID</th>
+                  <th>Campaign Title</th>
+                  <th>Category</th>
+                  <th>Aspect Ratio</th>
+                  <th style="width: 150px; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-gallery-list">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ==========================================
+       3. Modals & Drawer Overlays
+       ========================================== -->
+  
+  <!-- Add/Edit Product Side Drawer Modal -->
+  <div id="product-modal" class="modal-overlay hide">
+    <div class="drawer-panel animate-slide-in">
+      <div class="drawer-header">
+        <h2 id="modal-product-title" class="serif-title">Add Signature Product</h2>
+        <button id="close-product-modal-btn" class="close-btn">&times;</button>
+      </div>
+      
+      <div class="drawer-body">
+        <form id="product-form">
+          <!-- Hidden inputs for ID / Mode -->
+          <input type="hidden" id="form-product-id">
+          <input type="hidden" id="form-product-mode" value="CREATE">
+
+          <div class="form-group">
+            <label for="prod-name">PRODUCT NAME *</label>
+            <input type="text" id="prod-name" required placeholder="e.g. Lavender Dream Silk Dress">
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="prod-price">DISPLAY PRICE *</label>
+              <input type="text" id="prod-price" required placeholder="e.g. Rs. 8,900">
+            </div>
+            <div class="form-group">
+              <label for="prod-raw-price">RAW NUMBER VALUE *</label>
+              <input type="number" id="prod-raw-price" required placeholder="e.g. 8900">
+            </div>
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="prod-category">CATEGORY *</label>
+              <select id="prod-category" required>
+                <option value="" disabled selected>Select Category</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="prod-badge">FLOATING BADGE (OPTIONAL)</label>
+              <input type="text" id="prod-badge" placeholder="e.g. BEST SELLER, NEW">
+            </div>
+          </div>
+
+          <!-- Product Image Upload Widget with ImgBB integration -->
+          <div class="form-group img-upload-widget">
+            <label>PRODUCT SHOWCASE IMAGE *</label>
+            
+            <div class="uploader-container">
+              <div class="image-preview-frame" id="image-upload-preview" style="background-image: url('placeholder.png')"></div>
+              
+              <div class="upload-controls">
+                <input type="file" id="prod-image-file" accept="image/*" class="hide">
+                <button type="button" class="btn btn-outline" id="trigger-file-select-btn">
+                  SELECT IMAGE
+                </button>
+                
+                <span class="upload-hint">Image is uploaded securely via ImgBB</span>
+                
+                <!-- URL manual input backup -->
+                <div class="url-backup" style="margin-top: 10px; width: 100%;">
+                  <input type="text" id="prod-image-url" placeholder="Or enter image URL path manually" style="font-size: 11px; padding: 6px 10px;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload progress bar container -->
+            <div id="upload-progress-container" class="upload-progress-bar-wrap hide">
+              <div class="progress-bar-track">
+                <div id="upload-progress-fill" class="progress-fill" style="width: 0%"></div>
+              </div>
+              <span id="upload-status-text" class="progress-text">Uploading image to ImgBB (0%)...</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-desc">TEASER SUMMARY DESCRIPTION *</label>
+            <textarea id="prod-desc" rows="3" required placeholder="A short, stunning flowy description for catalog list views..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="prod-details">DETAILED SPECIFICATIONS (MATERIALS, FITS)</label>
+            <textarea id="prod-details" rows="2" placeholder="e.g. Crafted from 100% pure premium silk chiffon, invisible back zipper..."></textarea>
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="prod-care">CARE INSTRUCTIONS</label>
+              <input type="text" id="prod-care" placeholder="e.g. Dry clean only. Iron on low heat inside out.">
+            </div>
+            <div class="form-group">
+              <label for="prod-shipping">SHIPPING RULES</label>
+              <input type="text" id="prod-shipping" placeholder="e.g. Islandwide delivery, COD available.">
+            </div>
+          </div>
+
+          <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="prod-featured" style="width: 18px; height: 18px; cursor: pointer;">
+            <label for="prod-featured" style="cursor: pointer; margin: 0; font-weight: 600;">FEATURE PRODUCT ON MAIN HOMEPAGE GRID</label>
+          </div>
+
+          <div class="drawer-actions">
+            <button type="button" class="btn btn-outline" id="cancel-product-btn">CANCEL</button>
+            <button type="submit" class="btn btn-primary" id="save-product-btn">SAVE SIGNATURE PIECE</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add/Edit Gallery Item Side Drawer Modal -->
+  <div id="gallery-modal" class="modal-overlay hide">
+    <div class="drawer-panel animate-slide-in">
+      <div class="drawer-header">
+        <h2 id="modal-gallery-title" class="serif-title">Add Lookbook Item</h2>
+        <button id="close-gallery-modal-btn" class="close-btn">&times;</button>
+      </div>
+      
+      <div class="drawer-body">
+        <form id="gallery-form-elem">
+          <!-- Hidden inputs for ID / Mode -->
+          <input type="hidden" id="form-gallery-id">
+          <input type="hidden" id="form-gallery-mode" value="CREATE">
+
+          <div class="form-group">
+            <label for="gal-title">CAMPAIGN TITLE *</label>
+            <input type="text" id="gal-title" required placeholder="e.g. Lavender Archway Shoot">
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="gal-category">CATEGORY *</label>
+              <select id="gal-category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="Editorial">Editorial</option>
+                <option value="Collection">Collection</option>
+                <option value="Tailoring">Tailoring</option>
+                <option value="Detail">Detail</option>
+                <option value="Bespoke">Bespoke</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="gal-aspect">ASPECT RATIO *</label>
+              <select id="gal-aspect" required>
+                <option value="portrait">Portrait</option>
+                <option value="square">Square</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Gallery Image Upload Widget with ImgBB integration -->
+          <div class="form-group img-upload-widget">
+            <label>LOOKBOOK IMAGE *</label>
+            
+            <div class="uploader-container">
+              <div class="image-preview-frame" id="gallery-image-preview" style="background-image: url('placeholder.png')"></div>
+              
+              <div class="upload-controls">
+                <input type="file" id="gal-image-file" accept="image/*" class="hide">
+                <button type="button" class="btn btn-outline" id="trigger-gal-file-btn">
+                  SELECT IMAGE
+                </button>
+                
+                <span class="upload-hint">Image is uploaded securely via ImgBB</span>
+                
+                <!-- URL manual input backup -->
+                <div class="url-backup" style="margin-top: 10px; width: 100%;">
+                  <input type="text" id="gal-image-url" placeholder="Or enter image URL path manually" style="font-size: 11px; padding: 6px 10px;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload progress bar container -->
+            <div id="gal-upload-progress-container" class="upload-progress-bar-wrap hide">
+              <div class="progress-bar-track">
+                <div id="gal-upload-progress-fill" class="progress-fill" style="width: 0%"></div>
+              </div>
+              <span id="gal-upload-status-text" class="progress-text">Uploading image to ImgBB (0%)...</span>
+            </div>
+          </div>
+
+          <div class="drawer-actions">
+            <button type="button" class="btn btn-outline" id="cancel-gallery-btn">CANCEL</button>
+            <button type="submit" class="btn btn-primary" id="save-gallery-btn">SAVE LOOKBOOK ITEM</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Vanilla app dynamic scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
